@@ -1,2 +1,74 @@
+# ───────────────────────────────────────────────
+# 1)  ASP.NET / .NET (api/)
+# ───────────────────────────────────────────────
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+# 개발 인증서
+*.pfx
+# EF Core Migrations snapshots (선택적)
+# Migrations/*Designer.cs
+
+# ───────────────────────────────────────────────
+# 2)  Node / Next.js / Expo (web/, mobile/, packages/)
+# ───────────────────────────────────────────────
 node_modules/
+# pnpm store
+.pnpm/
+# Next.js
+.next/
+dist/
+out/
+# Expo / React Native
+.expo/
+.expo-shared/
+# Metro / React Native cache
+npm-cache/
+yarn-error.log
+# Env & config files
 .env*
+.env.*.local
+# Logs
+*.log
+*.log.*
+
+# ───────────────────────────────────────────────
+# 3)  TailwindCSS & Build Artifacts
+# ───────────────────────────────────────────────
+tailwind.css
+*.css.map
+
+# ───────────────────────────────────────────────
+# 4)  Docker / Containers
+# ───────────────────────────────────────────────
+# Docker compose override files
+docker-compose.override.yml
+# Local volume mounts
+volumes/
+# VS Code Dev Containers
+.devcontainer/
+
+# ───────────────────────────────────────────────
+# 5)  IDE / Editor
+# ───────────────────────────────────────────────
+.vscode/
+*.code-workspace
+.idea/
+*.sw?
+.DS_Store
+Thumbs.db
+
+# ───────────────────────────────────────────────
+# 6)  OS / Misc
+# ───────────────────────────────────────────────
+# macOS
+*.DS_Store
+# Windows
+ehthumbs.db
+Desktop.ini
+# Linux
+*~
