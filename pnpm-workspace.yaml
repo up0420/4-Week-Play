@@ -1,0 +1,12 @@
+packages:
+  - api
+  - web
+  - mobile
+  - packages/*
+
+ignoredBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - sharp
+  - unrs-resolver
+
+nodeLinker: hoisted
