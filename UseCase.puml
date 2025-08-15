@@ -1,0 +1,80 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor 사용자 as U
+actor 관리자 as A
+
+rectangle "4WeekPlay System" {
+
+  usecase "입력: 사주·질문지" as UC1
+  usecase "AI 사주 분석" as UC2
+  usecase "음양오행 비율 분석" as UC15
+  usecase "4 캐릭터 생성 (조상·부모·현재·미래)" as UC16
+  usecase "캐릭터 프로필 및 능력 열람" as UC18
+  usecase "타이쿤 시뮬레이션 시작" as UC6
+  usecase "경영 시나리오 분기 (성향별)" as UC7
+  usecase "자산 투자 및 수익 관리" as UC8
+  usecase "운영 이벤트 / 선택지 처리" as UC9
+  usecase "시뮬레이션 결과 피드백" as UC10
+  usecase "스토리 로그 열람" as UC11
+  usecase "실시간 알림 수신" as UC12
+  usecase "일일 운세/알람 스케줄" as UC13
+  usecase "통계/모니터링" as UC14
+  usecase "캐릭터별 LLM 페르소나 생성" as UC19
+  usecase "캐릭터별 AI 상담 수행" as UC20
+  usecase "상담 결과 기록 및 상태 반영" as UC21
+  usecase "캐릭터 선택지 인터랙션" as UC22
+}
+
+U --> UC1
+UC1 --> UC2
+UC2 --> UC15
+UC15 --> UC16
+UC16 --> UC6
+UC16 --> UC19
+U --> UC18
+U --> UC6
+U --> UC20
+UC19 --> UC20
+UC20 --> UC21
+U --> UC22
+UC22 --> UC9
+UC6 --> UC7
+UC7 --> UC8
+UC8 --> UC9
+UC9 --> UC10
+U --> UC11
+U --> UC12
+U --> UC13
+A --> UC14
+
+UC13 ..> U : Hangfire
+UC12 ..> U : SignalR
+UC2 ..> U : GPT-4o
+UC15 ..> U : GPT-4o
+UC19 ..> U : GPT-4o
+UC20 ..> U : GPT-4o
+
+note right of UC19
+  음양오행 성향 기반 페르소나 생성:<br/>
+  - 말투, 세계관, 직군 반영<br/>
+  - ex) 불 성향 → 강직한 장군 어투
+end note
+
+note right of UC20
+  캐릭터별 AI 상담 수행:<br/>
+  - "내가 오늘 어떤 결정을 하면 좋을까?"<br/>
+  - "지금 감정 상태는 어떤가요?"
+end note
+
+note right of UC21
+  상담 내용은 캐릭터 상태와<br/>
+  타이쿤 시뮬레이션에도 반영됨
+end note
+
+note right of UC22
+  사용자는 상담 결과에 따라<br/>
+  행동 선택지를 결정 가능
+end note
+@enduml

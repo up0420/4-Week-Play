@@ -1,96 +1,142 @@
+// Program.cs
+using Core.External;
+using Infrastructure.External;
+
+using System;
 using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql;              // ServerVersion.AutoDetect
+using Microsoft.OpenApi.Models;
+
+
+using Infrastructure.Data;
 using Hangfire;
 using Hangfire.MemoryStorage;
-using Microsoft.AspNetCore.SignalR;
+
+using Api.Hubs;                                      // NotificationHub
+using Api.Jobs;                                      // DailyFortuneJob
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ─── DB (MariaDB) ─────────────────────────────────────────────────────────────
-builder.Services.AddDbContext<TodoDb>(opt =>
-    opt.UseMySql(
-        builder.Configuration.GetConnectionString("Maria"),
-        new MySqlServerVersion(new Version(11, 0))));
+// ===== MVC & Swagger =====
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(o =>
+{
+    o.SwaggerDoc("v1", new OpenApiInfo { Title = "4WeekPlay API", Version = "v1" });
+});
 
-// ─── Hangfire ─────────────────────────────────────────────────────────────────
+// ===== DB (Pomelo AutoDetect) =====
+var conn = builder.Configuration.GetConnectionString("Maria")
+           ?? throw new InvalidOperationException("Missing connection string 'Maria'.");
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseMySql(conn, ServerVersion.AutoDetect(conn)));
+
+// ===== Hangfire =====
 builder.Services.AddHangfire(cfg => cfg.UseMemoryStorage());
 builder.Services.AddHangfireServer();
 
-// ─── SignalR ──────────────────────────────────────────────────────────────────
+// ===== SignalR =====
 builder.Services.AddSignalR();
 
-// ─── Swagger ──────────────────────────────────────────────────────────────────
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// ===================== DI 등록 (비제네릭 typeof 오버로드) =====================
+// Application Services
+builder.Services.AddScoped(
+    typeof(Application.Services.IFortuneService),
+    typeof(Application.Services.FortuneService));
+
+builder.Services.AddScoped(
+    typeof(Application.Services.ICharacterService),
+    typeof(Application.Services.CharacterService));
+
+builder.Services.AddScoped(
+    typeof(Application.Services.IChatService),
+    typeof(Application.Services.ChatService));
+
+builder.Services.AddScoped(
+    typeof(Application.Services.ISimulationService),
+    typeof(Application.Services.SimulationService));
+
+builder.Services.AddScoped(
+    typeof(Application.Services.ITodoService),
+    typeof(Application.Services.TodoService));
+
+// NotificationService: 구현체를 먼저 등록해두고…
+builder.Services.AddScoped(typeof(Application.Services.NotificationService));
+// …인터페이스는 팩토리로 매핑 (캐시/섀도잉 이슈 회피)
+builder.Services.AddScoped<Application.Services.INotificationService>(sp =>
+    sp.GetRequiredService<Application.Services.NotificationService>());
+
+builder.Services.AddScoped(
+    typeof(Application.Services.IStoryService),
+    typeof(Application.Services.StoryService));
+
+builder.Services.AddScoped(
+    typeof(Application.Services.IAdminService),
+    typeof(Application.Services.AdminService));
+
+builder.Services.AddScoped(
+    typeof(Application.Services.IUserService),
+    typeof(Application.Services.UserService));
+
+// Repositories
+builder.Services.AddScoped(
+    typeof(Core.Repositories.IUserRepository),
+    typeof(Infrastructure.Repositories.UserRepository));
+
+builder.Services.AddScoped(
+    typeof(Core.Repositories.ICharacterRepository),
+    typeof(Infrastructure.Repositories.CharacterRepository));
+
+builder.Services.AddScoped(
+    typeof(Core.Repositories.ITodoRepository),
+    typeof(Infrastructure.Repositories.TodoRepository));
+
+// 구현됐으면 주석 해제
+// builder.Services.AddScoped(
+//     typeof(Core.Repositories.IStoryRepository),
+//     typeof(Infrastructure.Repositories.StoryRepository));
+
+// External (SignalR wrapper)
+builder.Services.AddScoped(
+    typeof(Core.External.ISignalRService),
+    typeof(Api.Services.SignalRService));
+
+// Jobs
+builder.Services.AddTransient<DailyFortuneJob>();
+
+builder.Services.AddHttpClient<ILlmClient, OpenAIService>(c =>
+{
+    c.BaseAddress = new Uri("https://api.openai.com/v1/");
+});
+
 
 var app = builder.Build();
 
+// ===== Middleware =====
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseHangfireDashboard();        // http://localhost:5000/hangfire
+    app.UseHangfireDashboard();
 }
 
-// ─── CRUD Todo Endpoints ──────────────────────────────────────────────────────
-app.MapGet("/todos", async (TodoDb db)
-    => await db.Todos.OrderBy(t => t.Id).ToListAsync());
+app.UseHttpsRedirection();
+app.UseAuthorization();
 
-app.MapGet("/todos/{id:int}", async (int id, TodoDb db)
-    => await db.Todos.FindAsync(id) is Todo t ? Results.Ok(t) : Results.NotFound());
+app.MapControllers();
 
-app.MapPost("/todos", async (Todo todo, TodoDb db, IHubContext<TodoHub> hub) =>
+// SignalR Hub
+app.MapHub<NotificationHub>("/hubs/notify");
+
+// Hangfire: 매일 08:00 실행
+using (var scope = app.Services.CreateScope())
 {
-    db.Todos.Add(todo);
-    await db.SaveChangesAsync();
-    await hub.Clients.All.SendAsync("TodoAdded", todo);   // 실시간 브로드캐스트
-    return Results.Created($"/todos/{todo.Id}", todo);
-});
+    var mgr = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+    var job = scope.ServiceProvider.GetRequiredService<DailyFortuneJob>();
+    mgr.AddOrUpdate("DailyFortuneJob", () => job.RunAsync(), "0 8 * * *");
+}
 
-app.MapPut("/todos/{id:int}", async (int id, Todo input, TodoDb db) =>
-{
-    var todo = await db.Todos.FindAsync(id);
-    if (todo is null) return Results.NotFound();
-    todo.Title  = input.Title;
-    todo.IsDone = input.IsDone;
-    await db.SaveChangesAsync();
-    return Results.NoContent();
-});
-
-app.MapDelete("/todos/{id:int}", async (int id, TodoDb db) =>
-{
-    var todo = await db.Todos.FindAsync(id);
-    if (todo is null) return Results.NotFound();
-    db.Todos.Remove(todo);
-    await db.SaveChangesAsync();
-    return Results.NoContent();
-});
-
-// ─── Hangfire 테스트 ──────────────────────────────────────────────────────────
-app.MapPost("/jobs/ping", (IBackgroundJobClient jobs) =>
-{
-    jobs.Enqueue(() => Console.WriteLine("🔔 Ping from Hangfire!"));
-    return Results.Ok("Queued");
-});
-
-// ─── SignalR Hub ──────────────────────────────────────────────────────────────
-app.MapHub<TodoHub>("/hubs/todo");
-
-// 기본 헬스 체크
+// Health check
 app.MapGet("/", () => "4WeekPlay API ready");
 
 app.Run();
-
-// ─── EF Core Context & Model ──────────────────────────────────────────────────
-public class TodoDb(DbContextOptions<TodoDb> opts) : DbContext(opts)
-{
-    public DbSet<Todo> Todos => Set<Todo>();
-}
-public class Todo
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public bool IsDone { get; set; }
-}
-
-// ─── SignalR Hub ──────────────────────────────────────────────────────────────
-public class TodoHub : Hub { }

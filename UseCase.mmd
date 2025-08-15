@@ -1,0 +1,14 @@
+graph TD
+  U[사용자] --> UC1["입력: 사주·질문지"]
+  U --> UC2["캐릭터 상태 조회"]
+  U --> UC3["Todo 작성/완료"]
+  U --> UC4["실시간 알림 수신"]
+  U --> UC5["스토리 로그 열람"]
+  U --> UC6["일일 운세/알람 스케줄"]
+  U --> UC7["통계/모니터링"]
+  A[관리자] --> UC7
+  UC6 --> HF[Hangfire]
+  UC4 --> SignalR[SignalR Push]
+
+  classDef actor fill:#f9f,stroke:#333,stroke-width:2px;
+  class U,A actor
