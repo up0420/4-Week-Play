@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.Entities;
 using Core.Repositories;
@@ -28,6 +29,13 @@ namespace Application.Services
             var todos   = (await _todos.GetAllAsync()).Count();
             var stories = (await _stories.GetAllAsync()).Count();
             return new { users, todos, stories };
+        }
+
+        // 신규 오버로드: Controller에서 전달한 CancellationToken 수용
+        public Task<object> GetMonitoringDataAsync(CancellationToken cancellationToken)
+        {
+            // 내부 구현이 cancellationToken을 아직 사용하지 않으면 그대로 위임
+            return GetMonitoringDataAsync();
         }
     }
 }

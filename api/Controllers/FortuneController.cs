@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Application.Services;
 using Api.Dtos;
+using System.Collections.Generic; // List<string>
 
 namespace Api.Controllers
 {
@@ -21,7 +22,11 @@ namespace Api.Controllers
                     ? await _svc.GetTodayFortuneAsync(req.BirthDate.Value)
                     : await _svc.GetTodayFortuneAsync(System.Guid.Empty));
 
-            return Ok(new FortuneResponseDto { TodayFortune = fortune, Keywords = System.Array.Empty<string>() });
+            return Ok(new FortuneResponseDto
+            {
+                TodayFortune = fortune,
+                Keywords = new List<string>() // List<string>로 타입 일치
+            });
         }
     }
 }

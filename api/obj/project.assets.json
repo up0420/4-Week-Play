@@ -205,6 +205,22 @@
           "lib/netstandard2.0/_._": {}
         }
       },
+      "Microsoft.EntityFrameworkCore.InMemory/8.0.13": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "8.0.13"
+        },
+        "compile": {
+          "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.EntityFrameworkCore.Relational/8.0.13": {
         "type": "package",
         "dependencies": {
@@ -645,6 +661,7 @@
           "Core": "1.0.0",
           "Hangfire.Core": "1.8.20",
           "Microsoft.EntityFrameworkCore": "8.0.13",
+          "Microsoft.EntityFrameworkCore.InMemory": "8.0.13",
           "Microsoft.EntityFrameworkCore.Relational": "8.0.13",
           "Pomelo.EntityFrameworkCore.MySql": "8.0.3"
         },
@@ -900,6 +917,21 @@
         "lib/netstandard2.0/_._",
         "microsoft.entityframeworkcore.analyzers.8.0.13.nupkg.sha512",
         "microsoft.entityframeworkcore.analyzers.nuspec"
+      ]
+    },
+    "Microsoft.EntityFrameworkCore.InMemory/8.0.13": {
+      "sha512": "0e/vEkQGJ7mwacknDbUsvntuoQYlSWHuYmFDSSlkuwUKf+cKu9sKCaNUA6eH/+OOH2eEyioKMMPS5yp1wN8L+Q==",
+      "type": "package",
+      "path": "microsoft.entityframeworkcore.inmemory/8.0.13",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll",
+        "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.xml",
+        "microsoft.entityframeworkcore.inmemory.8.0.13.nupkg.sha512",
+        "microsoft.entityframeworkcore.inmemory.nuspec"
       ]
     },
     "Microsoft.EntityFrameworkCore.Relational/8.0.13": {
@@ -1792,23 +1824,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\user\\.nuget\\packages\\": {},
+    "C:\\Users\\김동현\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\4WeekPlay\\api\\api.csproj",
+      "projectUniqueName": "C:\\4-Week-Play\\api\\api.csproj",
       "projectName": "api",
-      "projectPath": "C:\\4WeekPlay\\api\\api.csproj",
-      "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-      "outputPath": "C:\\4WeekPlay\\api\\obj\\",
+      "projectPath": "C:\\4-Week-Play\\api\\api.csproj",
+      "packagesPath": "C:\\Users\\김동현\\.nuget\\packages\\",
+      "outputPath": "C:\\4-Week-Play\\api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\김동현\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -1823,14 +1855,14 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\4WeekPlay\\Application\\Application.csproj": {
-              "projectPath": "C:\\4WeekPlay\\Application\\Application.csproj"
+            "C:\\4-Week-Play\\Application\\Application.csproj": {
+              "projectPath": "C:\\4-Week-Play\\Application\\Application.csproj"
             },
-            "C:\\4WeekPlay\\Core\\Core.csproj": {
-              "projectPath": "C:\\4WeekPlay\\Core\\Core.csproj"
+            "C:\\4-Week-Play\\Core\\Core.csproj": {
+              "projectPath": "C:\\4-Week-Play\\Core\\Core.csproj"
             },
-            "C:\\4WeekPlay\\Infrastructure\\Infrastructure.csproj": {
-              "projectPath": "C:\\4WeekPlay\\Infrastructure\\Infrastructure.csproj"
+            "C:\\4-Week-Play\\Infrastructure\\Infrastructure.csproj": {
+              "projectPath": "C:\\4-Week-Play\\Infrastructure\\Infrastructure.csproj"
             }
           }
         }
@@ -1899,7 +1931,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

@@ -26,10 +26,18 @@ builder.Services.AddSwaggerGen(o =>
 });
 
 // ===== DB (Pomelo AutoDetect) =====
-var conn = builder.Configuration.GetConnectionString("Maria")
-           ?? throw new InvalidOperationException("Missing connection string 'Maria'.");
-builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseMySql(conn, ServerVersion.AutoDetect(conn)));
+var conn = builder.Configuration.GetConnectionString("Maria");
+if (!string.IsNullOrWhiteSpace(conn))
+{
+    builder.Services.AddDbContext<AppDbContext>(opt =>
+        opt.UseMySql(conn, ServerVersion.AutoDetect(conn)));
+}
+else
+{
+    // Fallback: 로컬/CI 초기 구동 보호
+    builder.Services.AddDbContext<AppDbContext>(opt =>
+        opt.UseInMemoryDatabase("AppDb_Fallback"));
+}
 
 // ===== Hangfire =====
 builder.Services.AddHangfire(cfg => cfg.UseMemoryStorage());

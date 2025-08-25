@@ -24,5 +24,8 @@
     <!-- ✅ Hangfire 핵심(네임스페이스 Hangfire 제공) -->
     <PackageReference Include="Hangfire.Core" Version="1.8.20" />
     <!-- 저장소/대시보드는 api에서 처리 → 여기선 Core만 필요 -->
+
+    <!-- InMemory Provider (테스트/CI용) -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.13" />
   </ItemGroup>
 </Project>

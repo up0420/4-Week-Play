@@ -12,9 +12,9 @@ namespace Api.Controllers
         public AdminController(AdminService svc) => _svc = svc;
 
         [HttpGet("monitor")]
-        public async Task<IActionResult> Monitor()
+        public async Task<IActionResult> Monitor(CancellationToken cancellationToken)
         {
-            var data = await _svc.GetMonitoringDataAsync();
+            var data = await _svc.GetMonitoringDataAsync(cancellationToken);
             return Ok(data);
         }
     }

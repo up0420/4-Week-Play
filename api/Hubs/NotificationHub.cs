@@ -42,7 +42,7 @@ namespace Api.Hubs
             await base.OnConnectedAsync();
         }
 
-        public override async Task OnDisconnectedAsync(Exception exception)
+        public override async Task OnDisconnectedAsync(Exception? exception)
         {
             // TODO: 필요 시 연결 해제 처리
             await base.OnDisconnectedAsync(exception);
